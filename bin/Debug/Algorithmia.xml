@@ -1,0 +1,375 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Algorithmia</name>
+    </assembly>
+    <members>
+        <member name="T:Algorithmia.Algorithm">
+            <summary>
+            Represents an Algorithmia algorithm that can API calls on a user's behalf.
+            </summary>
+        </member>
+        <member name="M:Algorithmia.Algorithm.#ctor(Algorithmia.Client,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Algorithmia.Algorithm"/> class.
+            This normally should not be called. Instead use the client's <c>algo</c> method.
+            </summary>
+            <param name="client">Client that is configured to talk to the correct Algorithmia API endpoint</param>
+            <param name="algoRef">The algorithm unique identifier: [author]/[algorithm name]/[optional version]</param>
+        </member>
+        <member name="M:Algorithmia.Algorithm.setOptions(System.Int32,System.Boolean,Algorithmia.AlgorithmOutputType,System.Collections.Generic.Dictionary{System.String,System.String})">
+            <summary>
+            Sets the options for the next algorithm call.
+            </summary>
+            <returns>A pointer to <c>this</c>.</returns>
+            <param name="timeout">The number of seconds we will allow the algorithm to run. Default is 300 seconds (5 minutes)</param>
+            <param name="stdout">If we want to get the standard output of the algorithm calls. You can only get output for your own algorithms</param>
+            <param name="outputType">Type of output. Default is the normal response parsing. Raw gets the byte array. Void is for asynchronous calls </param>
+            <param name="options">Dictionary for options to send to the server. Should normally be null.</param>
+        </member>
+        <member name="M:Algorithmia.Algorithm.pipeJson``1(System.String)">
+            <summary>
+            Call the algorithm with the <c>input</c> converted to a json object first. If parsing into a valid json object fails,
+            we call <c>pipe</c> with the original <c>input</c>.
+            </summary>
+            <returns>An AlgorithmResponse with the result of the call.</returns>
+            <param name="input">The input which which will be converted to json and sent as the input to the algorithm call.</param>
+            <typeparam name="T">The type of the <c>result</c> object in the <c>AlgorithmResponse</c>. If the output is Raw, this is ignored and a byte[] array is used instead.</typeparam>
+        </member>
+        <member name="M:Algorithmia.Algorithm.pipe``1(System.Object)">
+            <summary>
+            Call the algorithm with the <c>input</c>.
+            </summary>
+            <returns>An AlgorithmResponse with the result of the call.</returns>
+            <param name="input">The input which which will be json serialized and sent as the input to the algorithm call.</param>
+            <typeparam name="T">The type of the <c>result</c> object in the <c>AlgorithmResponse</c>. If the output is Raw, this is ignored and a byte[] array is used instead.</typeparam>
+        </member>
+        <member name="T:Algorithmia.AlgorithmiaException">
+            <summary>
+            Base exception for all exceptions thrown during algorithm or data API calls.
+            </summary>
+        </member>
+        <member name="T:Algorithmia.DataApiException">
+            <summary>
+            Exception that is used for data-related errors.
+            </summary>
+        </member>
+        <member name="T:Algorithmia.AlgorithmException">
+            <summary>
+            Exception that is used for algorithm-related errors.
+            </summary>
+        </member>
+        <member name="T:Algorithmia.AlgorithmOutputType">
+            <summary>
+            The valid algorithm output types.
+            </summary>
+        </member>
+        <member name="F:Algorithmia.AlgorithmOutputType.DEFAULT">
+            <summary>
+            The default output type. Deserializes the response as a json object with metadata.
+            </summary>
+        </member>
+        <member name="F:Algorithmia.AlgorithmOutputType.RAW">
+            <summary>
+            The raw output type. Deserializes the response as a byte array without the metadata.
+            </summary>
+        </member>
+        <member name="F:Algorithmia.AlgorithmOutputType.VOID">
+            <summary>
+            The void output type. This makes the request in an asynchronous manner.
+            </summary>
+        </member>
+        <member name="T:Algorithmia.ResponseMetadata">
+            <summary>
+            Response metadata for default (the standard) algorithm requests.
+            </summary>
+        </member>
+        <member name="F:Algorithmia.ResponseMetadata.content_type">
+            <summary>
+            The content type of the result.
+            </summary>
+        </member>
+        <member name="F:Algorithmia.ResponseMetadata.duration">
+            <summary>
+            The execution duration.
+            </summary>
+        </member>
+        <member name="F:Algorithmia.ResponseMetadata.timing">
+            <summary>
+            If this algorithm was called with the timing option enabled, this stores that timing data.
+            </summary>
+        </member>
+        <member name="T:Algorithmia.AlgorithmResponse">
+            <summary>
+            Algorithm response object.
+            </summary>
+        </member>
+        <member name="F:Algorithmia.AlgorithmResponse.async">
+            <summary>
+            Async type used when making the call. Only used in asynchronous calls.
+            </summary>
+        </member>
+        <member name="F:Algorithmia.AlgorithmResponse.request_id">
+            <summary>
+            The request identifier. Only used in asynchronous calls.
+            </summary>
+        </member>
+        <member name="F:Algorithmia.AlgorithmResponse.metadata">
+            <summary>
+            Metadata for the request. Only used in synchronous calls.
+            </summary>
+        </member>
+        <member name="F:Algorithmia.AlgorithmResponse.result">
+            <summary>
+            The result cast to object. If this was called with <c>AlgorithmOutputType.RAW</c> this is a byte array.
+            Otherwise it is the type passed into the <c>pipe</c> method that created the object. Only used in synchronous calls.
+            </summary>
+        </member>
+        <member name="F:Algorithmia.AlgorithmResponse.error">
+            <summary>
+            If this algorithm call failed, this holds the error messages. Only used in synchronous calls.
+            </summary>
+        </member>
+        <member name="T:Algorithmia.Client">
+            <summary>
+            The Algorithmia Client which is used to create Algorithm, DataFile, and DataDirectory objects.
+            This class contains a majority of the REST calls we use to interact with the Algorithmia platform.
+            </summary>
+        </member>
+        <member name="F:Algorithmia.Client.DEFAULT_ENCODING">
+            <summary>
+            The default encoding.
+            </summary>
+        </member>
+        <member name="F:Algorithmia.Client.apiAddress">
+            <summary>
+            The API address. Defaults to "https://api.algorithmia.com"
+            </summary>
+        </member>
+        <member name="M:Algorithmia.Client.#ctor(System.String,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Algorithmia.Client"/> class.
+            </summary>
+            <param name="key">The API key for the user calling the algorithm.</param>
+            <param name="address">Optional API address. When it's not specified, we use the public marketplace endpoint.</param>
+        </member>
+        <member name="M:Algorithmia.Client.algo(System.String)">
+            <summary>
+            Creates the Algorithm object given the reference to an algorithm.
+            </summary>
+            <returns>The Algorithm object.</returns>
+            <param name="algoRef">Algorithm reference which has the format: [author name]/[algorithm name]/[optional version]</param>
+        </member>
+        <member name="M:Algorithmia.Client.file(System.String)">
+            <summary>
+            Creates a DataFile object given the path to the file.
+            </summary>
+            <returns>The DataFile object.</returns>
+            <param name="dataUrl">Path to the data file.</param>
+        </member>
+        <member name="M:Algorithmia.Client.dir(System.String)">
+            <summary>
+            Creates a DataDirectory object given the path to the directory.
+            </summary>
+            <returns>The DataDirectory object.</returns>
+            <param name="path">Path for the directory.</param>
+        </member>
+        <member name="T:Algorithmia.DataDirectory">
+            <summary>
+            Represents a data directory in the Algorithmia Data API or directory that is accessed via a data connector.
+            </summary>
+        </member>
+        <member name="M:Algorithmia.DataDirectory.#ctor(Algorithmia.Client,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Algorithmia.DataDirectory"/> class.
+            This normally should not be called. Instead use the client's <c>dir</c> method
+            or any method in this class that returns one of these.
+            </summary>
+            <param name="client">Client that is configured to talk to the correct Algorithmia API endpoint.</param>
+            <param name="dataUrl">The path identifier for the directory.</param>
+        </member>
+        <member name="M:Algorithmia.DataDirectory.getName">
+            <summary>
+            Gets the name of the directory without the rest of the path.
+            </summary>
+            <returns>The name of the directory.</returns>
+        </member>
+        <member name="M:Algorithmia.DataDirectory.exists">
+            <summary>
+            Checks if the directory exists.
+            </summary>
+            <returns>True if the directory exists.</returns>
+        </member>
+        <member name="M:Algorithmia.DataDirectory.create(Algorithmia.ReadDataAcl)">
+            <summary>
+            Create the directory with the correct access modifiers.
+            </summary>
+            <returns>A pointer to <c>this</c>.</returns>
+            <param name="acl">The access level for the directory.</param>
+        </member>
+        <member name="M:Algorithmia.DataDirectory.delete(System.Boolean)">
+            <summary>
+            Delete this directory. If the <c>force</c> parameter is false, and it is not empty, an exception will be thrown.
+            </summary>
+            <returns>A pointer to <c>this</c>.</returns>
+            <param name="force">Force the delete even if the directory is not empty.</param>
+        </member>
+        <member name="M:Algorithmia.DataDirectory.file(System.String)">
+            <summary>
+            Creates the child file object for the given file in this directory.
+            </summary>
+            <returns>The child file.</returns>
+            <param name="child">Name of the child file.</param>
+        </member>
+        <member name="M:Algorithmia.DataDirectory.dir(System.String)">
+            <summary>
+            Creates the child directory object for the given directory in this directory.
+            </summary>
+            <returns>The child directory.</returns>
+            <param name="child">Name of the child directory.</param>
+        </member>
+        <member name="M:Algorithmia.DataDirectory.updatePermissions(Algorithmia.ReadDataAcl)">
+            <summary>
+            Updates the access levels for this directory.
+            </summary>
+            <returns>A pointer to <c>this</c>.</returns>
+            <param name="acl">The new access level for the directory.</param>
+        </member>
+        <member name="M:Algorithmia.DataDirectory.getPermissions">
+            <summary>
+            Gets the access levels for this directory.
+            </summary>
+            <returns>The access control levels for this directory.</returns>
+        </member>
+        <member name="M:Algorithmia.DataDirectory.files">
+            <summary>
+            Gets an iterator of <c>DataFile</c>s for all the child files in this directory.
+            </summary>
+            <returns>The child files.</returns>
+        </member>
+        <member name="M:Algorithmia.DataDirectory.dirs">
+            <summary>
+            Gets an iterator of <c>DataDirectory</c>s for all the child directories in this directory.
+            </summary>
+            <returns>The child directories.</returns>
+        </member>
+        <member name="T:Algorithmia.DataDirectory.DataIterator">
+            <summary>
+            An iterator of either all <c>DataFile</c> or all <c>DataDirectory</c> objects.
+            </summary>
+        </member>
+        <member name="M:Algorithmia.DataDirectory.DataIterator.GetEnumerator">
+            <summary>
+            Gets the enumerator of either files or directories.
+            </summary>
+            <returns>The enumerator.</returns>
+        </member>
+        <member name="T:Algorithmia.DataFile">
+            <summary>
+            Represents a data file in the Algorithmia Data API or file that is accessed via a data connector.
+            </summary>
+        </member>
+        <member name="M:Algorithmia.DataFile.#ctor(Algorithmia.Client,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Algorithmia.DataFile"/> class.
+            This normally should not be called. Instead use the client's <c>file</c> method
+            or any method in the <c>DataDirectory</c> object that returns one of these.
+            </summary>
+            <param name="client">Client that is configured to talk to the correct Algorithmia API endpoint</param>
+            <param name="dataUrl">The path identifier for the file.</param>
+        </member>
+        <member name="M:Algorithmia.DataFile.getSize">
+            <summary>
+            Gets the size of the file in bytes. This value is only valid when it was created from a call to
+            <c>DataDirectory.files</c>.
+            </summary>
+            <returns>The size of the file in bytes or -1 if the file size is unknown.</returns>
+        </member>
+        <member name="M:Algorithmia.DataFile.getlastModifiedTime">
+            <summary>
+            Gets the last modified time for the file. This value is only valid when it was created from a call to
+            <c>DataDirectory.files</c>.
+            </summary>
+            <returns>The last modified time or <c>System.DateTime.MinValue</c> if it is unknown.</returns>
+        </member>
+        <member name="M:Algorithmia.DataFile.getName">
+            <summary>
+            Gets the name of the file without the rest of the path (everything after the last slash).
+            </summary>
+            <returns>The file name.</returns>
+        </member>
+        <member name="M:Algorithmia.DataFile.exists">
+            <summary>
+            Checks if the file exists.
+            </summary>
+            <returns>True if the file exists.</returns>
+        </member>
+        <member name="M:Algorithmia.DataFile.delete">
+            <summary>
+            Deletes this file.
+            </summary>
+            <returns>Whether the delete was successful.</returns>
+        </member>
+        <member name="M:Algorithmia.DataFile.put(System.String,System.Text.Encoding)">
+            <summary>
+            Saves the input with the given encoding to the file. This overwrites the contents of the file.
+            </summary>
+            <returns>A pointer to <c>this</c>.</returns>
+            <param name="input">String to write to the file</param>
+            <param name="encoding">The encoding of the string</param>
+        </member>
+        <member name="M:Algorithmia.DataFile.put(System.Byte[])">
+            <summary>
+            Saves the byte array to the file. This overwrites the contents of the file.
+            </summary>
+            <returns>A pointer to <c>this</c>.</returns>
+            <param name="bytes">Byte array to write to the file</param>
+        </member>
+        <member name="M:Algorithmia.DataFile.put(System.IO.Stream)">
+            <summary>
+            Reads the contents of the stream and saves it to the file. This overwrites the contents of the file.
+            </summary>
+            <returns>A pointer to <c>this</c>.</returns>
+            <param name="stream">The stream to write to the file.</param>
+        </member>
+        <member name="M:Algorithmia.DataFile.getString(System.Text.Encoding)">
+            <summary>
+            Gets the content of the file as a string with the corresponding encoding.
+            </summary>
+            <returns>The contents of the file.</returns>
+            <param name="encoding">The encoding to use when turning the file contents into a string.</param>
+        </member>
+        <member name="M:Algorithmia.DataFile.getBytes">
+            <summary>
+            Gets the content of the file as a byte array.
+            </summary>
+            <returns>The contents of the file.</returns>
+        </member>
+        <member name="M:Algorithmia.DataFile.getFile">
+            <summary>
+            Gets the content of the file as a file stream.
+            </summary>
+            <returns>The contents of the file.</returns>
+        </member>
+        <member name="T:Algorithmia.ReadDataAcl">
+            <summary>
+            Read data ACLs for data directories.
+            </summary>
+        </member>
+        <member name="F:Algorithmia.ReadDataAcl.PRIVATE">
+            <summary>
+            The private ACL - only your algorithms while you call them can read this directory.
+            </summary>
+        </member>
+        <member name="F:Algorithmia.ReadDataAcl.PUBLIC">
+            <summary>
+            The public ACL - any algorithm call can read from this directory.
+            </summary>
+        </member>
+        <member name="F:Algorithmia.ReadDataAcl.MY_ALGOS">
+            <summary>
+            My algorithms ACL - any of my algorithms called by anyone on the platform can read this directory.
+            </summary>
+        </member>
+    </members>
+</doc>
